@@ -9,15 +9,13 @@
 		
 		var app = angular.module('oink', []);
 		
-		app.controller('OinkCtrl', function($scope) {
-			/*Oink AngularJS Controller. 1st argumet : Name of Controller, 2nd argument : actual functionality*/
-			$scope.piggy = [
-				'Hello',
-				'Wassup',
-				'How are you',
-				'Goodbye',
-				'Hello again'
-			];
+		app.controller('OinkCtrl', function($scope, $http) {
+			/*Oink AngularJS Controller. 1st argumet : Name of Controller, 2nd argument : actual functionality, $scope is a service in AngularJS across web pages*/
+
+			$http.get('/posts').then(function(response){ // $http is a service and .get is it's function
+
+				$scope.posts = response.data; // ***IMP: data extracted from server.js (backend) instead of frontend
+			});
 		});
 
 	</script>
@@ -32,9 +30,9 @@
 			<input type="password" size="30" placeholder="Password">
 		</div>
 		<div class="col-md-8">
-			<h3 ng-repeat="pig in piggy"> <!-- like a for-each loop -->
+			<h3 ng-repeat="post in posts"> <!-- like a for-each loop -->
 				<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-				{{ pig }}
+				{{ post }}
 			</h3>
 		</div>
 	</div>
