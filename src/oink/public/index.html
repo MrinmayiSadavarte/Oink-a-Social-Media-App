@@ -14,17 +14,35 @@
 		/*Oink AngularJS Controller. 1st argumet : Name of Controller, 2nd argument : actual functionality, $scope is a service in AngularJS across web pages*/
 		app.controller('OinkCtrl', function($scope, $http) {
 			
+			/****IMP: sending data to server from frontend; JSON object in curly brackets i.e variable and it's property
+			// As soon as a post is submitted using Submit button, it is stored in the database and getPosts() function
+			is called to print the post automatically on-the-go */
+			
 			$scope.submitNewPost = function() {
-				//***IMP: sending data to server from frontend; JSON object in curly brackets i.e variable and it's property
 				$http.post('/posts', {newPost: $scope.newPost}).then(function() {
-					alert("Successfully posted");
+					getPosts();
+					$scope.newPost = '';
 				});
 			};
 
-			$http.get('/posts').then(function(response){ // $http is a service and .get is it's function
 
-				$scope.posts = response.data; // ***IMP: data extracted from server.js (backend) instead of frontend
-			});
+			$scope.removePost = function(deletepost) {
+				$http.put('/posts/remove', {post: deletepost}).then(function() {
+					getPosts();
+				});
+			};
+
+			
+
+			function getPosts() {
+				$http.get('/posts').then(function(response){ // $http is a service and .get is it's function
+
+					$scope.posts = response.data; // ***IMP: data extracted from server.js (backend) instead of frontend
+				});
+			}
+
+			getPosts();
+			
 		});
 
 	</script>
@@ -47,7 +65,8 @@
 			</div>
 			<h3 ng-repeat="post in posts"> <!-- like a for-each loop -->
 				<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-				{{ post }}
+				{{ post.text }}
+				<a href ng-click="removePost(post)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
 			</h3>
 		</div>
 	</div>

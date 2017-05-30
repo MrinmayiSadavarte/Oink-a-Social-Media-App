@@ -1,33 +1,69 @@
 // Server side app - backend
 
 var express = require('express');
+var MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectId;
 var bodyParser = require('body-parser');
 var app = express();
+var db = null;
+
+/* 'oink' is the database, 27017 is the default port, 'connect' is the function: 1st argument is
+connection string, 2nd argument is callback function consisting of task after connected */
+MongoClient.connect("mongodb://localhost:27017/oink", function(err, dbconn) {
+  if(!err) {
+    console.log("We are connected");
+    db = dbconn;
+  }
+});
+
 
 app.use(bodyParser.json());
 
 app.use(express.static('public')); // public is the folder containing front-end stuff
 
-var posts = [
-	'Hello',
-	'Wassup',
-	'How are you',
-	'Goodbye',
-	'Hello again'
-];
-
 // Created an API for connecting backend to frontend
 // req : contains request object, res : response object to send data back, next : errors like database error etc.
+
 app.get('/posts', function(req, res, next){
-	res.send(posts);
+	
+	db.collection('posts', function(err, postsCollection) {
+		postsCollection.find().toArray(function(err, posts) {
+			return res.json(posts); // use res.json here instead of res.send
+		});
+	});
 });
 
 // stores the data on the server, handles post request from frontend
 // Syntax: post(url, data, [config])
+
 app.post('/posts', function(req, res, next) {
-	posts.push(req.body.newPost);
-	res.send(); // this is important else the server can hang
+
+	db.collection('posts', function(err, postsCollection) {
+
+		var newPost = {
+			text: req.body.newPost
+		};
+
+		/* Arguments - 1st : object (created in the above line), 2nd : options always {w:1} i.e {write mode : 1},
+		3rd : callback function */
+		postsCollection.insert(newPost, {w:1}, function(err, posts) {
+			return res.send(); // use res.send here instead of res.json // this is important else the server can hang
+		});
+	});
 });
+
+
+app.put('/posts/remove', function(req, res, next) {
+
+	db.collection('posts', function(err, postsCollection) {
+
+		var postId = req.body.post._id;
+		postsCollection.remove({_id: ObjectId(postId)}, {w:1}, function(err, result) {
+			return res.send(); // use res.send here instead of res.json // this is important else the server can hang
+		});
+	});
+});
+
 
 app.listen(3000, function () { // 3000 is the port number on which server is listening
 	console.log('Example app listening on port 3000!');
