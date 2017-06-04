@@ -6,16 +6,37 @@
 	<title>Oink</title>
 	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="style.css">
-	<script type="text/javascript" src="angular.min.js"></script>
+	<!-- <script type="text/javascript" src="angular.min.js"></script> -->
+	<!-- <script type="text/javascript" src="angular-route.min.js"></script> -->
+	
+	<script type="text/javascript" src="https://code.angularjs.org/1.4.9/angular.min.js"></script>
+	<script type="text/javascript" src="https://code.angularjs.org/1.4.9/angular-route.js"></script>
+
 	<script type="text/javascript">
 		
-		var app = angular.module('oink', []);
+		var app = angular.module('oink', ['ngRoute']);
 		
+		app.config(function($routeProvider, $locationProvider) {
+			$routeProvider
+	   		.when('/', {
+	    		templateUrl: 'home.html',
+	    		controller: 'HomeController',
+	    	})
+	    	.when('/signup', {
+	    		templateUrl: 'signup.html',
+	    		controller: 'SignupController',
+	    	});
+
+	  	});
+
+
+// -------------------------- 1st Controller (HomeController) ----------------------------- //
+
 		/*Oink AngularJS Controller. 1st argumet : Name of Controller, 2nd argument : actual functionality, $scope is a service in AngularJS across web pages*/
-		app.controller('OinkCtrl', function($scope, $http) {
+		app.controller('HomeController', function($scope, $http) {
 			
 			/****IMP: sending data to server from frontend; JSON object in curly brackets i.e variable and it's property
-			// As soon as a post is submitted using Submit button, it is stored in the database and getPosts() function
+			/ As soon as a post is submitted using Submit button, it is stored in the database and getPosts() function
 			is called to print the post automatically on-the-go */
 			
 			$scope.submitNewPost = function() {
@@ -32,7 +53,6 @@
 				});
 			};
 
-			
 
 			function getPosts() {
 				$http.get('/posts').then(function(response){ // $http is a service and .get is it's function
@@ -45,32 +65,27 @@
 			
 		});
 
+// -------------------------- 2nd Controller (SignupController) ----------------------------- //
+
+		app.controller('SignupController', function($scope, $http) {
+			
+			$scope.submitSignup = function() {
+				var newUser = {
+					username: $scope.username,
+					password: $scope.password
+				};
+
+				$http.post('/users', newUser).then(function() {
+					alert('You have successfully created an account');
+				});
+			}
+
+		});
+
 	</script>
 </head>
-<body ng-controller="OinkCtrl">
+<body>
 	<h1 class="page-title">Oink</h1>
-	<div class="row feed">
-		<div class="col-md-4">
-			<h4>Login</h4>
-			<input type="text" size="30" placeholder="Username">
-			<br><br>
-			<input type="password" size="30" placeholder="Password">
-		</div>
-		<div class="col-md-8">
-			<div class="new-post">
-				<!-- form-control provides CSS-type (style) control over the button, ng-model is a part of AngularJS -->
-				<input type="text" class="form-control" ng-model="newPost" placeholder="What is your new post?">
-				<br>
-				<button class="btn" type="button" ng-click="submitNewPost()">Submit</button>
-			</div>
-			<h3 ng-repeat="post in posts"> <!-- like a for-each loop -->
-				<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-				{{ post.text }}
-				<a href ng-click="removePost(post)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-			</h3>
-		</div>
-	</div>
-
-
+	<div ng-view></div>  <!-- ng-view selects the corresponding controller when on the page automatically -->
 </body>
 </html>

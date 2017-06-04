@@ -58,7 +58,18 @@ app.put('/posts/remove', function(req, res, next) {
 	db.collection('posts', function(err, postsCollection) {
 
 		var postId = req.body.post._id;
-		postsCollection.remove({_id: ObjectId(postId)}, {w:1}, function(err, result) {
+		postsCollection.remove({_id: ObjectId(postId)}, {w:1}, function(err, posts) {
+			return res.send(); // use res.send here instead of res.json // this is important else the server can hang
+		});
+	});
+});
+
+
+app.post('/users', function(req, res, next) {
+
+	db.collection('users', function(err, usersCollection) {
+
+		usersCollection.insert(req.body, {w:1}, function(err) {
 			return res.send(); // use res.send here instead of res.json // this is important else the server can hang
 		});
 	});

@@ -1,0 +1,23 @@
+<div class="row feed">
+	<div class="col-md-4">
+		<h4>Login</h4>
+		<input type="text" size="30" placeholder="Username">
+		<br><br>
+		<input type="password" size="30" placeholder="Password">
+		<br><br>
+		<a href="#/signup">Not a member? Sign up</a>
+	</div>
+	<div class="col-md-8">
+		<div class="new-post">
+			<!-- form-control provides CSS-type (style) control over the button, ng-model is a part of AngularJS -->
+			<input type="text" class="form-control" ng-model="newPost" placeholder="What is your new post?">
+			<br>
+			<button class="btn" type="button" ng-click="submitNewPost()">Submit</button>
+		</div>
+		<h3 ng-repeat="post in posts"> <!-- like a for-each loop -->
+			<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			{{ post.text }}
+			<a href ng-click="removePost(post)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+		</h3>
+	</div>
+</div>
