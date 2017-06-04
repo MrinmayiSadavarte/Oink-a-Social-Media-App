@@ -11,11 +11,13 @@
 			<a href="#/signup">Not a member? Sign up</a>
 		</div>
 		<div ng-show="currentUser">
-			Hello, {{ currentUser }}.			
+			Hello, {{ currentUser }}.
+			<br><br>
+			<a href ng-click="logout()">Logout</a>			
 		</div>
 	</div>
 	<div class="col-md-8">
-		<div class="new-post">
+		<div class="new-post" ng-show="currentUser">
 			<!-- form-control provides CSS-type (style) control over the button, ng-model is a part of AngularJS -->
 			<input type="text" class="form-control" ng-model="newPost" placeholder="What is your new post?">
 			<br>
@@ -25,6 +27,8 @@
 			<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
 			{{ post.text }}
 			<a href ng-click="removePost(post)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+			<br>
+			<small>{{ post.username }}</small>
 		</h3>
 	</div>
 </div>

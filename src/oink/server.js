@@ -41,10 +41,15 @@ app.get('/posts', function(req, res, next){
 
 app.post('/posts', function(req, res, next) {
 
+	var token = req.headers.authorization;
+	var user = jwt.decode(token, JWT_SECRET);
+
 	db.collection('posts', function(err, postsCollection) {
 
 		var newPost = {
-			text: req.body.newPost
+			text: req.body.newPost,
+			user: user._id,
+			username: user.username
 		};
 
 		/* Arguments - 1st : object (created in the above line), 2nd : options always {w:1} i.e {write mode : 1},
@@ -58,10 +63,14 @@ app.post('/posts', function(req, res, next) {
 
 app.put('/posts/remove', function(req, res, next) {
 
+	var token = req.headers.authorization;
+	var user = jwt.decode(token, JWT_SECRET);
+
 	db.collection('posts', function(err, postsCollection) {
 
 		var postId = req.body.post._id;
-		postsCollection.remove({_id: ObjectId(postId)}, {w:1}, function(err, posts) {
+		// remove the post only when user matches the user with authorized user id (stored in database)
+		postsCollection.remove({_id: ObjectId(postId), user: user._id}, {w:1}, function(err, posts) {
 			return res.send(); // use res.send here instead of res.json // this is important else the server can hang
 		});
 	});

@@ -49,7 +49,11 @@
 			is called to print the post automatically on-the-go */
 			
 			$scope.submitNewPost = function() {
-				$http.post('/posts', {newPost: $scope.newPost}).then(function() {
+				$http.post('/posts',
+					{newPost: $scope.newPost},
+					{headers: {
+						'authorization': $rootScope.token
+					}}).then(function() {
 					getPosts();
 					$scope.newPost = '';
 				});
@@ -57,7 +61,11 @@
 
 
 			$scope.removePost = function(deletepost) {
-				$http.put('/posts/remove', {post: deletepost}).then(function() {
+				$http.put('/posts/remove',
+					{post: deletepost},
+					{headers: {
+						'authorization': $rootScope.token
+					}}).then(function() {
 					getPosts();
 				});
 			};
@@ -68,17 +76,23 @@
 			$scope.signin = function() {
 				$http.put('/users/signin', {username: $scope.username, password: $scope.password})
 					.then(function(res) {
-						console.log(res.data.token);
 						$cookies.put('token', res.data.token);
 						$cookies.put('currentUser', $scope.username);
 						$rootScope.token = res.data.token;
 						$rootScope.currentUser = $scope.username;
-						alert("You have successfully signed in");
 					}, function(err) {
 						alert("Failed Sign In attempt");
 
 					});
-			}
+			};
+
+
+			$scope.logout = function() {
+				$cookies.remove('token');
+				$cookies.remove('currentUser');
+				$rootScope.token = null;
+				$rootScope.currentUser = null;
+			};
 
 
 			function getPosts() {
