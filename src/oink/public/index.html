@@ -54,6 +54,19 @@
 			};
 
 
+			// To create a sign in/ new sign up for user
+			
+			$scope.signin = function() {
+				$http.put('/users/signin', {username: $scope.username, password: $scope.password})
+					.then(function() {
+						alert("You have successfully signed in");
+					}, function(err) {
+						alert("Failed Sign In attempt");
+
+					});
+			}
+
+
 			function getPosts() {
 				$http.get('/posts').then(function(response){ // $http is a service and .get is it's function
 
@@ -85,7 +98,7 @@
 	</script>
 </head>
 <body>
-	<h1 class="page-title">Oink</h1>
+	<h1 class="page-title"><a href="#/">Oink</a></h1>
 	<div ng-view></div>  <!-- ng-view selects the corresponding controller when on the page automatically -->
 </body>
 </html>

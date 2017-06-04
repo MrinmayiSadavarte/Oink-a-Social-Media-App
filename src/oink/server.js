@@ -4,6 +4,7 @@ var express = require('express');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
 var bodyParser = require('body-parser');
+var bcrypt = require('bcryptjs');
 var app = express();
 var db = null;
 
@@ -65,15 +66,52 @@ app.put('/posts/remove', function(req, res, next) {
 });
 
 
+
+// Creating and encrypting a new user in the database
+
 app.post('/users', function(req, res, next) {
 
 	db.collection('users', function(err, usersCollection) {
 
-		usersCollection.insert(req.body, {w:1}, function(err) {
-			return res.send(); // use res.send here instead of res.json // this is important else the server can hang
+		bcrypt.genSalt(10, function(err, salt) {
+    		bcrypt.hash(req.body.password, salt, function(err, hash) {
+
+        		var newUser = {
+					username: req.body.username,
+					password: hash
+				};
+
+				usersCollection.insert(newUser, {w:1}, function(err) {
+					return res.send(); // use res.send here instead of res.json // this is important else the server can hang
+				});
+    		});
+		});	
+	});
+});
+
+
+// Decrypting and comparing username and password using bcryptjs
+
+app.put('/users/signin', function(req, res, next) {
+
+	db.collection('users', function(err, usersCollection) {
+
+		usersCollection.findOne({username: req.body.username}, function(err, user) {
+			
+			// Comparing both passwords:
+			// 1st argument: User's attempted password, 2nd : Hashed password, 3rd : Call-back function
+
+			bcrypt.compare(req.body.password, user.password, function(err, result) {
+				if (result) {
+					return res.send();
+				} else {
+					return res.status(400).send();   // Error 400 : passwords do not match
+				}
+			});			
 		});
 	});
 });
+
 
 
 app.listen(3000, function () { // 3000 is the port number on which server is listening
