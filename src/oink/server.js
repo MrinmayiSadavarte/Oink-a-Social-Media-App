@@ -6,6 +6,8 @@ var ObjectId = require('mongodb').ObjectId;
 var bodyParser = require('body-parser');
 var bcrypt = require('bcryptjs');
 var app = express();
+var jwt = require('jwt-simple');
+var JWT_SECRET = 'abcde';  // constant variable
 var db = null;
 
 /* 'oink' is the database, 27017 is the default port, 'connect' is the function: 1st argument is
@@ -103,7 +105,8 @@ app.put('/users/signin', function(req, res, next) {
 
 			bcrypt.compare(req.body.password, user.password, function(err, result) {
 				if (result) {
-					return res.send();
+					var myToken = jwt.encode(user, JWT_SECRET);
+					return res.json({token: myToken});
 				} else {
 					return res.status(400).send();   // Error 400 : passwords do not match
 				}
